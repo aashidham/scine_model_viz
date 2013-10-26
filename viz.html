@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test</title>
+<script src="http://code.jquery.com/jquery-2.0.0.js"></script> <!-- <script src="http://code.jquery.com/jquery-1.10.0.js"></script> -->
+<script src="http://dygraphs.com/1.0.1/dygraph-combined.js"></script>
+</head>
+<body>
+<br/>
+Probe Data: <br/>
+<textarea id="probedata" cols=100 rows=2>
+[[0,1.6e-7],[0.5e-6,2e-7],[1e-6,2.3e-7],[1.5e-6,2.4e-7],[1.7e-6,2.5e-7],[2e-6,3e-7]]
+</textarea><br/>
+<br/>Env region from <textarea id="h_low" type="number" cols=10 rows=1 style="height:10px;">1e-6</textarea> to <textarea id="h_high" type="number" cols=10 rows=1 style="height:10px;">1.7e-6</textarea><br/>
+<br/><button id="update">Update Graph Below (for visualization only)</button><br/><br/>
+<div id="demodiv"></div>
+<script>
+/*
+var maxX = data[data.length-1][0]
+for (i=0;i<data.length;i++)
+{
+	var temp = data[i][0];
+	data[i][0] = data[i][1];
+	data[i][1] = maxX - temp;
+}
+*/
+function redraw()
+{
+var data = eval($("#probedata").val());
+g = new Dygraph(
+	document.getElementById("demodiv"),
+	data,
+	{
+		labels: ["Distance from tip", "Probe Radius"],
+		xlabel: "Distance from tip",
+		interactionModel: {},
+		underlayCallback: function(canvas, area, g) {
+			var bottom_left = g.toDomCoords(parseFloat($("#h_low").val()), -20);
+			var top_right = g.toDomCoords(parseFloat($("#h_high").val()), +20);
+			
+			var left = bottom_left[0];
+			var right = top_right[0];
+			
+			canvas.fillStyle = "rgba(255, 255, 102, 1.0)";
+			canvas.fillRect(left, area.y, right - left, area.h);
+		}
+	});
+}
+
+$(function(){
+	redraw();
+	$("#update").click(function()
+		{
+			$("#demodiv").empty();
+			redraw();
+		});
+});
+</script>
+</body>
