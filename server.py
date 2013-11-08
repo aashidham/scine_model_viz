@@ -15,9 +15,12 @@ def application(environ, start_response):
 		response = Response(str(sid))
 		params = request.form["params"]
 		email = request.form["email"]
+		low_env = request.form["low_env"]
+		high_env = request.form["high_env"]
+		probedata = request.form["probedata"]
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		server_socket = sock.connect(('localhost', 8080))
-		sock.sendall(pickle.dumps([sid,email,params]))
+		sock.sendall(pickle.dumps([sid,email,params,probedata,low_env,high_env]))
 	else:
 		response = Response(open("index.html",'rb').read(),mimetype=mimetypes.guess_type("index.html")[0])
 	pickle.dump(sid+1,open("global","wb"))
