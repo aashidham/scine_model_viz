@@ -19,7 +19,7 @@ def application(environ, start_response):
 		high_env = request.form["high_env"]
 		probedata = request.form["probedata"]
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		server_socket = sock.connect(('localhost', 8080))
+		server_socket = sock.connect(('localhost', 8081))
 		sock.sendall(pickle.dumps([sid,email,params,probedata,low_env,high_env]))
 	else:
 		response = Response(open("index.html",'rb').read(),mimetype=mimetypes.guess_type("index.html")[0])
@@ -28,4 +28,4 @@ def application(environ, start_response):
 	
 
 if __name__ == '__main__':
-	run_simple('0.0.0.0', 80, application)
+	run_simple('0.0.0.0',8082, application)

@@ -66,7 +66,7 @@ def run(fn):
     
     root = "/".join(root)
     
-    os.system('find %s -type d -links 2 | parallel -v  --gnu --sshlogin 32/ubuntu@ec2-54-200-16-9.us-west-2.compute.amazonaws.com --transfer --return {}/the.data "ngspice -p {}/model1.cir < {}/spice.input"' % root)
+    os.system('find %s -type d -links 2 | parallel -v  --gnu --sshlogin 32/ubuntu@ec2-54-200-54-145.us-west-2.compute.amazonaws.com --transfer --return {}/the.data "ngspice -p {}/model1.cir < {}/spice.input"' % root)
 
     for i in range(len(samples)):
     	for j in range(int(samples[0]['Nsteps'])+1):
