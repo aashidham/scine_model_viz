@@ -23,24 +23,19 @@ def build_table(probedata):
 		r = elem[1]
 		curr_sr = neher/(math.pi*2*(r + 50e-9))
 		seal_resistance.append(curr_sr)
-	seal_resistance = numpy.cumsum(seal_resistance)
-	part_idx = x_partition(seal_resistance,5)
-	print part_idx
 	np_probedata = numpy.array(probedata)
-	for idx in range(1,len(part_idx)):
-		curr = part_idx[idx]
-		prev = part_idx[idx-1]
-		avg_r = numpy.mean(np_probedata[prev:curr,1])
-		avg_neher = numpy.mean(np_probedata[prev:curr,4])
-		print avg_neher/(math.pi*2*(avg_r + 50e-9))
-	print "with real integration:"
+	seal_resistance = scipy.integrate.cumtrapz(seal_resistance,np_probedata[:,0])
+	part_idx = x_partition(seal_resistance,5)
+	result = []
 	for idx in range(1,len(part_idx)):
 		curr = part_idx[idx]
 		prev = part_idx[idx-1]
 		r = np_probedata[prev:curr,1]
 		neher = np_probedata[prev:curr,4]
 		sr = neher.astype(float)/(math.pi*2*(r + 50e-9))
-		print scipy.integrate.trapz(sr,np_probedata[prev:curr,0])
+		result.append(scipy.integrate.trapz(sr,np_probedata[prev:curr,0]))
+	print result
+	import pdb; pdb.set_trace()
 
 """
 def dist(a,b):
