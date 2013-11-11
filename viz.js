@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+/*<!DOCTYPE html>
 <html>
 <head>
 <title>Test</title>
@@ -18,7 +18,7 @@ Env plot:
 Materials plot:
 <div id="demodiv2"></div>
 <script>
-/*
+
 var maxX = data[data.length-1][0]
 for (i=0;i<data.length;i++)
 {
@@ -113,5 +113,3 @@ $(function(){
 			redraw();
 		});
 });
-</script>
-</body>

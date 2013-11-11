@@ -1,10 +1,11 @@
-import numpy, math, scipy
+import numpy, math, scipy.integrate
 
 
 def x_partition(y,num):
 	to_return = [len(y)-1]
 	last_y = y[len(y)-1]
 	y_per_component = last_y/float(num)
+	print y_per_component
 	for i in range(1,num):
 		curr_y = last_y - i*y_per_component
 		for j in range(len(y)):
@@ -39,7 +40,7 @@ def build_table(probedata):
 		r = np_probedata[prev:curr,1]
 		neher = np_probedata[prev:curr,4]
 		sr = neher.astype(float)/(math.pi*2*(r + 50e-9))
-		print scipy.integrate.simps(sr,np_probedata[prev:curr,0])
+		print scipy.integrate.trapz(sr,np_probedata[prev:curr,0])
 
 """
 def dist(a,b):
