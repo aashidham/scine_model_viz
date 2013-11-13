@@ -3,7 +3,6 @@ from concurrence import dispatch, Tasklet
 from time import sleep
 import pickle, shutil
 import email_send2
-import probe_shape
 
 import platform
 platform.install()
@@ -23,10 +22,15 @@ def handler(client_socket):
 	f = open(str(sid)+"/"+str(sid)+".csv","wb")
 	f.write(params)
 	f.close()
-	probedata = eval(probedata)
-	probe_shape.build_table(probedata)
-	import pdb; pdb.set_trace()
-	from_csv.run(str(sid)+"/"+str(sid)+".csv")
+	f = open(str(sid)+"/"+str(sid)+"_probe_shape.txt","wb")
+	f.write(probedata)
+	f.close()
+	f = open(str(sid)+"/"+str(sid)+"_low_high.txt","wb")
+	f.write(low_env+"\n")
+	f.write(high_env+"\n")
+	f.close()
+	
+	from_csv.run(sid,float(low_env),float(high_env))
 	email_send2.send_mail(email,str(sid),str(sid))
 	"""
 	except Exception,e:

@@ -4,6 +4,7 @@ import os
 import sys
 import unittest
 import subprocess
+import probe_shape
 
 import insert_scine
 import model.simple
@@ -11,9 +12,11 @@ import progression
 import the_platform
 
 
-def run(fn):
+def run(sid,low_env,high_env):
     # Build up experimental samples.
+    fn = str(sid)+"/"+str(sid)+".csv"
     print 'reading from %s..' % fn
+    import pdb; pdb.set_trace()
     f = open(fn)
     c = csv.reader(f)
     samples = [{}]
@@ -52,6 +55,9 @@ def run(fn):
     except StopIteration:
         pass
 
+    probedata_file = str(sid)+"/"+str(sid)+"_probe_shape.txt"
+    probedata = eval(open(probedata_file).read())
+    probe_shape.build_table(probedata)
     # For all samples,
     root = the_platform._root
     for i, sample in enumerate(samples):
