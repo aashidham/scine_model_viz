@@ -17,14 +17,10 @@ def x_partition(y,num):
 
 
 def build_table(probedata):
-	seal_resistance = []
-	for elem in probedata:
-		neher = elem[4]
-		r = elem[1]
-		curr_sr = neher/(math.pi*2*(r + 100e-9))
-		seal_resistance.append(curr_sr)
 	np_probedata = numpy.array(probedata)
-	seal_resistance = scipy.integrate.cumtrapz(seal_resistance,np_probedata[:,0])
+	neher = np_probedata[:,4]
+	radius = np_probedata[:,1]
+	seal_resistance = scipy.integrate.cumtrapz(neher/(math.pi*2*(radius + 50e-9)),np_probedata[:,0])
 	part_idx = x_partition(seal_resistance,5)
 	return part_idx
 	"""
