@@ -61,7 +61,11 @@ def run(sid,low_env,high_env):
     low_idx = closest(probedata,low_env)
     high_idx = closest(probedata,high_env)
     probedata_env = probedata[low_idx:high_idx]
-    indxs = probe_shape.build_table(probedata_env)
+    env_indxs = probe_shape.build_table(probedata_env)
+    probedata_intra = probedata[0:low_idx]
+    probedata_extra = probedata[high_idx:]
+    
+    
     # For all samples,
     root = the_platform._root
     for i, sample in enumerate(samples):
