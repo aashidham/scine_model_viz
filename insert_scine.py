@@ -5,7 +5,7 @@ import spice
 import the_platform
 
 
-def insert_scine(model, **params):
+def insert_scine(model, params):
 
     # The length of the electrode inside of, enveloped by, and outside
     # of the cell over time.

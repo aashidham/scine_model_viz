@@ -16,7 +16,6 @@ def run(sid,low_env,high_env):
     # Build up experimental samples.
     fn = str(sid)+"/"+str(sid)+".csv"
     print 'reading from %s..' % fn
-    import pdb; pdb.set_trace()
     f = open(fn)
     c = csv.reader(f)
     samples = [{}]
@@ -68,7 +67,7 @@ def run(sid,low_env,high_env):
 		f.close()
 		# and run the simulation.
 		print sample
-		insert_scine.insert_scine(model.simple, **sample)
+		insert_scine.insert_scine(model.simple, sample)
     
     root = "/".join(root)
     
