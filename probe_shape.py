@@ -21,11 +21,13 @@ def build_table(probedata):
 	for elem in probedata:
 		neher = elem[4]
 		r = elem[1]
-		curr_sr = neher/(math.pi*2*(r + 50e-9))
+		curr_sr = neher/(math.pi*2*(r + 100e-9))
 		seal_resistance.append(curr_sr)
 	np_probedata = numpy.array(probedata)
 	seal_resistance = scipy.integrate.cumtrapz(seal_resistance,np_probedata[:,0])
 	part_idx = x_partition(seal_resistance,5)
+	return part_idx
+	"""
 	result = []
 	for idx in range(1,len(part_idx)):
 		curr = part_idx[idx]
@@ -36,6 +38,7 @@ def build_table(probedata):
 		result.append(scipy.integrate.trapz(sr,np_probedata[prev:curr,0]))
 	print result
 	import pdb; pdb.set_trace()
+	"""
 
 """
 def dist(a,b):

@@ -11,6 +11,8 @@ import model.simple
 import progression
 import the_platform
 
+def closest(a,val):
+	return min(range(len(a)), key=lambda i: abs(a[i]-val))
 
 def run(sid,low_env,high_env):
     # Build up experimental samples.
@@ -56,7 +58,10 @@ def run(sid,low_env,high_env):
 
     probedata_file = str(sid)+"/"+str(sid)+"_probe_shape.txt"
     probedata = eval(open(probedata_file).read())
-    probe_shape.build_table(probedata)
+    low_idx = closest(probedata,low_env)
+    high_idx = closest(probedata,high_env)
+    probedata_env = probedata[low_idx:high_idx]
+    indxs = probe_shape.build_table(probedata_env)
     # For all samples,
     root = the_platform._root
     for i, sample in enumerate(samples):
