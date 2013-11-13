@@ -4,12 +4,13 @@ import os
 import sys
 import unittest
 import subprocess
-import probe_shape
+from probe_shape import *
 
 import insert_scine
 import model.simple
 import progression
 import the_platform
+
 
 def closest(a,val):
 	return min(range(len(a)), key=lambda i: abs(a[i]-val))
@@ -58,13 +59,32 @@ def run(sid,low_env,high_env):
 
     probedata_file = str(sid)+"/"+str(sid)+"_probe_shape.txt"
     probedata = eval(open(probedata_file).read())
-    low_idx = closest(probedata,low_env)
-    high_idx = closest(probedata,high_env)
+    probedata = numpy.array(probedata)
+    low_idx = closest(probedata[:,0],low_env)
+    high_idx = closest(probedata[:,0],high_env)
     probedata_env = probedata[low_idx:high_idx]
-    env_indxs = probe_shape.build_table(probedata_env)
     probedata_intra = probedata[0:low_idx]
     probedata_extra = probedata[high_idx:]
+    probedata_mem = numpy.column_stack((probedata_env[:,0],probedata_env[:,1]+100e-9))
     
+    A_intra=area(probedata_intra)
+    A_env=area(probedata_env)
+    A_membrane=area(probedata_mem)
+    A_extra=area(probedata_extra)
+    L_intra=arc_length(probedata_intra)
+    L_env=arc_length(probedata_env)
+    L_extra=arc_length(probedata_extra)
+    
+    derived_params = {
+		'A_intra': A_intra,
+		'A_env': A_env,
+		'A_membrane': A_membrane,
+		'A_extra': A_extra,
+		'L_intra': L_intra,
+		'L_env': L_env,
+		'L_extra': L_extra,
+		}
+ 
     
     # For all samples,
     root = the_platform._root
@@ -76,19 +96,18 @@ def run(sid,low_env,high_env):
 		f.close()
 		# and run the simulation.
 		print sample
-		insert_scine.insert_scine(model.simple, sample)
+		insert_scine.insert_scine(probedata_env,sample,derived_params)
     
     root = "/".join(root)
     
     os.system('find %s -type d -links 2 | parallel -v  --gnu --sshlogin 32/ubuntu@ec2-54-200-54-145.us-west-2.compute.amazonaws.com --transfer --return {}/the.data "ngspice -p {}/model1.cir < {}/spice.input"' % root)
 
     for i in range(len(samples)):
-    	for j in range(int(samples[0]['Nsteps'])+1):
-			mag_plot_fn = root + "/trial=%i/t=%i/plot-mag.png" % (i,j)
-			phase_plot_fn = root + "/trial=%i/t=%i/plot-phase.png" % (i,j)
-			data = root + "/trial=%i/t=%i/the.data" % (i,j)
-			subprocess.check_call("gnuplot -e \"set term png; set output '%s'; set logscale x; plot '%s' using 1:2 with linespoints\"" % (mag_plot_fn, data), shell=True)
-			subprocess.check_call("gnuplot -e \"set term png; set output '%s'; set logscale x; plot '%s' using 3:4 with linespoints\"" % (phase_plot_fn, data), shell=True)
+	   mag_plot_fn = root + "/trial=%i/plot-mag.png" % i
+	   phase_plot_fn = root + "/trial=%i/plot-phase.png" % i
+	   data = root + "/trial=%i/the.data" % i
+	   subprocess.check_call("gnuplot -e \"set term png; set output '%s'; set logscale x; plot '%s' using 1:2 with linespoints\"" % (mag_plot_fn, data), shell=True)
+	   subprocess.check_call("gnuplot -e \"set term png; set output '%s'; set logscale x; plot '%s' using 3:4 with linespoints\"" % (phase_plot_fn, data), shell=True)
 
 if __name__ == '__main__':
     assert len(sys.argv) == 2

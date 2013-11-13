@@ -1,5 +1,16 @@
 import numpy, math, scipy.integrate
 
+def arc_length(a):
+	total_len = 0
+	for i in range(1,len(a)):
+		curr = a[i,1:2]
+		prev = a[i-1,1:2]
+		total_len = total_len + numpy.linalg.norm(curr-prev)
+	return total_len
+
+def area(a):
+	return 2*math.pi*scipy.integrate.trapz(a[:,1],a[:,0])
+
 
 def x_partition(y,num):
 	to_return = [len(y)-1]
@@ -16,14 +27,14 @@ def x_partition(y,num):
 	return to_return
 
 
-def build_table(probedata):
-	np_probedata = numpy.array(probedata)
+def build_table(np_probedata,num_compartments):
 	neher = np_probedata[:,4]
 	radius = np_probedata[:,1]
-	seal_resistance = scipy.integrate.cumtrapz(neher/(math.pi*2*(radius + 50e-9)),np_probedata[:,0])
-	part_idx = x_partition(seal_resistance,5)
+	seal_resistance = scipy.integrate.cumtrapz(neher/(math.pi*2*radius),np_probedata[:,0])
+	part_idx = x_partition(seal_resistance,int(num_compartments))
 	return part_idx
-	"""
+	
+def sr_array(np_probedata,part_idx):
 	result = []
 	for idx in range(1,len(part_idx)):
 		curr = part_idx[idx]
@@ -32,9 +43,7 @@ def build_table(probedata):
 		neher = np_probedata[prev:curr,4]
 		sr = neher.astype(float)/(math.pi*2*(r + 50e-9))
 		result.append(scipy.integrate.trapz(sr,np_probedata[prev:curr,0]))
-	print result
-	import pdb; pdb.set_trace()
-	"""
+	return result
 
 """
 def dist(a,b):

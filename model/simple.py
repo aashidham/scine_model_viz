@@ -30,9 +30,9 @@ def generate(neuron_path, filename, params):
                     netlist.remove(n)
                 return ns
         raise Exception('component not found');
-    Rseali = get_component('R_seal_i', strip=True)
-    Rmembranei = get_component('Rmembrane_i', strip=True)
-    Cmembranei = get_component('Cmembrane_i', strip=True)
+    Rseal = get_component('R_seal_i', strip=True)
+    Rmembrane = get_component('Rmembrane_i', strip=True)
+    Cmembrane = get_component('Cmembrane_i', strip=True)
     Xsheathedcpei = get_component('Xsheathedcpe_i', strip=True)
 
     def place(component, x, i, o):
@@ -41,17 +41,25 @@ def generate(neuron_path, filename, params):
         c[1] = str(i)
         c[2] = str(o)
         netlist.append(' '.join(c))
+    def place2(component, x, i, o, num):
+        c = list(component)
+        d = []
+        d.append(c[0] + '_%s' % x)
+        d.append(str(i))
+        d.append(str(o))
+        d.append(str(num))
+        netlist.append(' '.join(d))
     Rseali_out = 'solution_bus'
     for i in range(int(params['compartments'])):
         if i == params['compartments'] - 1:
             compartment = 'Rpene_bus'
         else:
             compartment = 'compartment_%s' %i 
-        place(Rseali, i, compartment, Rseali_out)
+        place2(Rseal, i, compartment, Rseali_out,params['R_seal_i'][i])
         Rseali_out = compartment
         place(Xsheathedcpei, i, Rseali_out, 'electrode_bus')
-        place(Rmembranei, i, Rseali_out, 'cell_bus')
-        place(Cmembranei, i, Rseali_out, 'cell_bus')
+        place2(Rmembrane, i, Rseali_out, 'cell_bus',params['Rmembrane_i'][i])
+        place2(Cmembrane, i, Rseali_out, 'cell_bus',params['Cmembrane_i'][i])
 
     # Make the CPEs.
     netlist.extend([''] + model.ladder_cpe.generate('extra_cpe', 50, params['CPE_alpha'], params['CPE_k'] / (params['A_extra'] + 1e-30)))
