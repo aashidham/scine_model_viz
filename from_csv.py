@@ -10,6 +10,7 @@ import insert_scine
 import model.simple
 import progression
 import the_platform
+import numpy, math, scipy.integrate
 
 
 def closest(a,val):
@@ -62,14 +63,14 @@ def run(sid,low_env,high_env):
     probedata = numpy.array(probedata)
     low_idx = closest(probedata[:,0],low_env)
     high_idx = closest(probedata[:,0],high_env)
-    probedata_env = probedata[low_idx:high_idx]
+    probedata_env = probedata[low_idx:high_idx+1]
     probedata_intra = probedata[0:low_idx]
-    probedata_extra = probedata[high_idx:]
+    probedata_extra = probedata[high_idx+1:]
     probedata_mem = numpy.column_stack((probedata_env[:,0],probedata_env[:,1]+100e-9))
     
     A_intra=area(probedata_intra)
     A_env=area(probedata_env)
-    A_membrane=area(probedata_mem)
+    A_membrane=area(probedata_mem) + math.pi*probedata_mem[0]**2
     A_extra=area(probedata_extra)
     L_intra=arc_length(probedata_intra)
     L_env=arc_length(probedata_env)
@@ -96,6 +97,7 @@ def run(sid,low_env,high_env):
 		f.close()
 		# and run the simulation.
 		print sample
+		assert len(probedata_env) > int(sample['compartments'])
 		insert_scine.insert_scine(probedata_env,sample,derived_params)
     
     root = "/".join(root)

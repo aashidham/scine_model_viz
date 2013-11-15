@@ -1,5 +1,8 @@
 import numpy, math, scipy.integrate
 
+def closest(a,val):
+	return min(range(len(a)), key=lambda i: abs(a[i]-val))
+
 def arc_length(a):
 	total_len = 0
 	for i in range(1,len(a)):
@@ -19,9 +22,7 @@ def x_partition(y,num):
 	print y_per_component
 	for i in range(1,num):
 		curr_y = last_y - i*y_per_component
-		for j in range(len(y)):
-			if y[j] < curr_y and y[j+1] > curr_y:
-				to_return.append(j)
+		to_return.append(closest(y,curr_y))
 	to_return.append(0)
 	to_return.reverse()
 	return to_return
@@ -30,20 +31,11 @@ def x_partition(y,num):
 def build_table(np_probedata,num_compartments):
 	neher = np_probedata[:,4]
 	radius = np_probedata[:,1]
-	seal_resistance = scipy.integrate.cumtrapz(neher/(math.pi*2*radius),np_probedata[:,0])
+	seal_resistance = (1/(math.pi*2))*scipy.integrate.cumtrapz(neher/(radius + 50e-9),np_probedata[:,0])
+	print seal_resistance
 	part_idx = x_partition(seal_resistance,int(num_compartments))
+	assert len(part_idx) == len(set(part_idx)) # ensure no repeats
 	return part_idx
-	
-def sr_array(np_probedata,part_idx):
-	result = []
-	for idx in range(1,len(part_idx)):
-		curr = part_idx[idx]
-		prev = part_idx[idx-1]
-		r = np_probedata[prev:curr,1]
-		neher = np_probedata[prev:curr,4]
-		sr = neher.astype(float)/(math.pi*2*(r + 50e-9))
-		result.append(scipy.integrate.trapz(sr,np_probedata[prev:curr,0]))
-	return result
 
 """
 def dist(a,b):
