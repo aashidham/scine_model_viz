@@ -1,18 +1,35 @@
 import json, pdb
 import math, model, numpy
 import probe_shape
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from cStringIO import StringIO
 
 import spice
 import the_platform
 from copy import deepcopy
 import scipy.integrate
 
-def insert_scine(probedata_env, params, derived):
+def insert_scine(probedata,probedata_env, params, derived):
         compartments = params['compartments']
         A_membrane = derived['A_membrane']
         part_idx = probe_shape.build_table(probedata_env,compartments)
         print part_idx
         assert len(part_idx) == int(params['compartments'])+1
+        
+        plt.figure()
+        plt.plot(probedata[:,0],probedata[:,1])
+        la = max(probedata[:,1])
+        for idx in part_idx:
+        	plt.plot([probedata_env[idx,0]]*20,numpy.linspace(0,la,20))
+        sio = StringIO()
+        plt.savefig(sio)
+        f = open(the_platform.file('probe.png'), 'wb')
+        f.write(sio.getvalue())
+        f.close()
+        plt.clf()
+        
         R_seal=[]
         Rmembrane=[]
         Cmembrane=[]

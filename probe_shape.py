@@ -34,7 +34,7 @@ def build_table(np_probedata,num_compartments):
 	seal_resistance = (1/(math.pi*2))*scipy.integrate.cumtrapz(neher/(radius + 50e-9),np_probedata[:,0])
 	print seal_resistance
 	part_idx = x_partition(seal_resistance,int(num_compartments))
-	assert len(part_idx) == len(set(part_idx)) # ensure no repeats
+	assert len(part_idx) == len(set(part_idx)), "too many compartments, not enough data" # ensure no repeats
 	return part_idx
 
 """

@@ -70,7 +70,7 @@ def run(sid,low_env,high_env):
     
     A_intra=area(probedata_intra)
     A_env=area(probedata_env)
-    A_membrane=area(probedata_mem) + math.pi*probedata_mem[0]**2
+    A_membrane=area(probedata_mem) + math.pi*probedata_mem[0,1]**2
     A_extra=area(probedata_extra)
     L_intra=arc_length(probedata_intra)
     L_env=arc_length(probedata_env)
@@ -98,7 +98,7 @@ def run(sid,low_env,high_env):
 		# and run the simulation.
 		print sample
 		assert len(probedata_env) > int(sample['compartments'])
-		insert_scine.insert_scine(probedata_env,sample,derived_params)
+		insert_scine.insert_scine(probedata,probedata_env,sample,derived_params)
     
     root = "/".join(root)
     
@@ -108,8 +108,8 @@ def run(sid,low_env,high_env):
 	   mag_plot_fn = root + "/trial=%i/plot-mag.png" % i
 	   phase_plot_fn = root + "/trial=%i/plot-phase.png" % i
 	   data = root + "/trial=%i/the.data" % i
-	   subprocess.check_call("gnuplot -e \"set term png; set output '%s'; set logscale x; plot '%s' using 1:2 with linespoints\"" % (mag_plot_fn, data), shell=True)
-	   subprocess.check_call("gnuplot -e \"set term png; set output '%s'; set logscale x; plot '%s' using 3:4 with linespoints\"" % (phase_plot_fn, data), shell=True)
+	   subprocess.check_call("gnuplot -e \"set term png; set output '%s'; set logscale x; plot '%s' using 1:2 with linespoints notitle\"" % (mag_plot_fn, data), shell=True)
+	   subprocess.check_call("gnuplot -e \"set term png; set output '%s'; set logscale x; plot '%s' using 3:4 with linespoints notitle\"" % (phase_plot_fn, data), shell=True)
 
 if __name__ == '__main__':
     assert len(sys.argv) == 2
