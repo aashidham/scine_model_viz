@@ -20,7 +20,7 @@ def generate(neuron_path, filename, params):
     model_fn = run_netlister('model/simple.sch')
 
     # Find and repeat the compartment motif.
-
+    import pdb; pdb.set_trace()
     netlist = filter(lambda l: l != '.END', open(model_fn).read().split('\n'))
     def get_component(name, strip=False):
         for n in netlist:

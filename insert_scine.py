@@ -16,13 +16,18 @@ def insert_scine(probedata,probedata_env, params, derived):
         A_membrane = derived['A_membrane']
         part_idx = probe_shape.build_table(probedata_env,compartments)
         print part_idx
-        assert len(part_idx) == int(params['compartments'])+1
         
         plt.figure()
         plt.plot(probedata[:,0],probedata[:,1])
+        materials_idx = probe_shape.material_boundaries(probedata)
+        color_list = plt.cm.Set3(numpy.linspace(0, 1, len(materials_idx)))[:,0:3]
+        for idx in range(1,len(materials_idx)):
+        	curr = materials_idx[idx]
+        	prev = materials_idx[idx-1]
+        	plt.fill_between(probedata[prev:curr+1,0],0,probedata[prev:curr+1,1],color=color_list[idx])
         la = max(probedata[:,1])
         for idx in part_idx:
-        	plt.plot([probedata_env[idx,0]]*20,numpy.linspace(0,la,20))
+        	plt.plot([probedata_env[idx,0]]*20,numpy.linspace(0,la,20),'black')
         sio = StringIO()
         plt.savefig(sio)
         f = open(the_platform.file('probe.png'), 'wb')
@@ -50,6 +55,7 @@ def insert_scine(probedata,probedata_env, params, derived):
         derived['R_seal_i'] = R_seal
         derived['Rmembrane_i'] = Rmembrane
         derived['Cmembrane_i'] = Cmembrane
+        #derived['CPE_alpha'] = 
         print derived
         f = open(the_platform.file('derived_params.json'), 'w')
         f.write(json.dumps(derived))
@@ -61,5 +67,5 @@ def insert_scine(probedata,probedata_env, params, derived):
         for k, v in derived.items():
             assert k not in p
             p[k] = v
-        cir_path = model.simple.generate('data/short-spike', the_platform.file('model1.cir'), p)
+        cir_path = model.simple2.generate(the_platform.file('model1.cir'), p)
         spice.ac_analysis(cir_path, -5, 5)

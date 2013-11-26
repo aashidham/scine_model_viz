@@ -30,12 +30,12 @@ def handler(client_socket):
 	f.write(high_env+"\n")
 	f.close()
 	
-	try:
-		from_csv.run(sid,float(low_env),float(high_env))
-		email_send2.send_mail(email,str(sid),str(sid))
-
+	from_csv.run(sid,float(low_env),float(high_env))
+	email_send2.send_mail(email,str(sid),str(sid))
+	"""
 	except Exception,e:
 		email_send2.send_error(email,str(type(e))+" "+str(e),str(sid))
+	"""
 	#shutil.rmtree(sid)
 
 
