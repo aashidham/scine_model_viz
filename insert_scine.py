@@ -70,7 +70,6 @@ def insert_scine(probedata,probedata_env, params, derived,cpes):
         f = open(the_platform.file('derived_params.json'), 'w')
         f.write(json.dumps(derived))
         f.close()
-
         # Mix together all params, the model will need them all. And
         # do the analysis.
         p = dict(params)

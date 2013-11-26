@@ -6,8 +6,8 @@ def closest(a,val):
 def arc_length(a):
 	total_len = 0
 	for i in range(1,len(a)):
-		curr = a[i,1:2]
-		prev = a[i-1,1:2]
+		curr = a[i,0:2]
+		prev = a[i-1,0:2]
 		total_len = total_len + numpy.linalg.norm(curr-prev)
 	return total_len
 
@@ -16,7 +16,7 @@ def area(a):
 
 
 def x_partition(y,num):
-	to_return = [len(y)-1]
+	to_return = [len(y)]
 	last_y = y[-1]
 	y_per_component = last_y/float(num)
 	print y_per_component

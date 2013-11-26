@@ -34,7 +34,7 @@ def generate(name, n, alpha, d_p):
     # Return circuit.
 
     cpe = ['.subckt %s in out' % name]
-    cpe.append('* alpha=%s n=%s f_low=%s f_high=%s' % (alpha, n, f_low, f_high))
+    cpe.append('*k/area=%s alpha=%s n=%s f_low=%s f_high=%s' % (d_p, alpha, n, f_low, f_high))
 
     i = 0
     for r, c in zip(r_k, c_k):

@@ -7,13 +7,13 @@ import model.ladder_cpe
 
 def generate(filename, params,cpes):
 	netlist = ["""* Spice netlister for gnetlist
-CStray 0 electrode_bus %g""" % params['CStray']]
-	netlist.append('RStray 0 electrode_bus %g'% params['RStray'])
-	netlist.append('Rbath 0 solution_bus %g'% params['Rbath'])
-	netlist.append('Cwholecell solution_bus cell_bus %g'%params['Cwholecell'])
-	netlist.append('Rwholecell solution_bus cell_bus %g'%params['Rwholecell'])
-	netlist.append('R_pene cell_bus Rpene_bus %g'%params['R_pene'])
-	netlist.append('\n%s\n\n%s\n%s\n') #first for extreme_cpes, second for env_region, third for the generated_ladders
+CStray 0 electrode_bus %s""" % params['CStray']]
+	netlist.append('RStray 0 electrode_bus %s'% params['RStray'])
+	netlist.append('Rbath 0 solution_bus %s'% params['Rbath'])
+	netlist.append('Cwholecell solution_bus cell_bus %s'%params['Cwholecell'])
+	netlist.append('Rwholecell solution_bus cell_bus %s'%params['Rwholecell'])
+	netlist.append('R_pene cell_bus Rpene_bus %s'%params['R_pene'])
+	netlist.append('%s\n\n%s\n%s\n') #first for extreme_cpes, second for env_region, third for the generated_ladders
 	netlist.append('Vcell cell_bus 0 1v ac')
 	netlist.append('.model cell_potential filesource (file="data/short-spike", amploffset=[0], amplscale=[1])')
 	netlist = '\n'.join(netlist)
@@ -29,12 +29,12 @@ CStray 0 electrode_bus %g""" % params['CStray']]
 	env_region = []
 	for i in range(int(params['compartments'])):
 		if i==0:
-			env_region.append("R_seal_i_0 compartment_0 solution_bus %g" % params['R_seal_i'][i])
+			env_region.append("R_seal_i_0 compartment_0 solution_bus %s" % params['R_seal_i'][i])
 		else:
-			env_region.append("R_seal_i_%i compartment_%i compartment_%i %g" % (i,i,i-1,params['R_seal_i'][i]))
+			env_region.append("R_seal_i_%i compartment_%i compartment_%i %s" % (i,i,i-1,params['R_seal_i'][i]))
 		env_region.append("Xsheathedcpe_i_%i compartment_%i electrode_bus sheathed_cpe_i_%i" % (i,i,i))
-		env_region.append("Rmembrane_i_%i compartment_%i cell_bus %g" % (i,i,params['Rmembrane_i'][i]))
-		env_region.append("Cmembrane_i_%i compartment_%i cell_bus %g" % (i,i,params['Cmembrane_i'][i]))
+		env_region.append("Rmembrane_i_%i compartment_%i cell_bus %s" % (i,i,params['Rmembrane_i'][i]))
+		env_region.append("Cmembrane_i_%i compartment_%i cell_bus %s" % (i,i,params['Cmembrane_i'][i]))
 	env_region = '\n'.join(env_region)
 	
 	generated_ladders=[]
