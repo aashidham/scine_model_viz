@@ -1,5 +1,6 @@
 import json, pdb
-import math, model, numpy
+import math, numpy
+import model.simple2
 import probe_shape
 import matplotlib
 matplotlib.use('Agg')
@@ -11,7 +12,7 @@ import the_platform
 from copy import deepcopy
 import scipy.integrate
 
-def insert_scine(probedata,probedata_env, params, derived):
+def insert_scine(probedata,probedata_env, params, derived,cpes):
         compartments = params['compartments']
         A_membrane = derived['A_membrane']
         part_idx = probe_shape.build_table(probedata_env,compartments)
@@ -38,9 +39,14 @@ def insert_scine(probedata,probedata_env, params, derived):
         R_seal=[]
         Rmembrane=[]
         Cmembrane=[]
+        CPE_alpha = []
+        CPE_k = []
+        area = []
         for idx in range(1,len(part_idx)):
 			curr = part_idx[idx]
 			prev = part_idx[idx-1]
+			CPE_alpha.append(probedata_env[prev,2])
+			CPE_k.append(probedata_env[prev,3])
 			r = probedata_env[prev:curr+1,1]
 			neher = probedata_env[prev:curr+1,4]
 			sr = neher.astype(float)/(math.pi*2*(r + 50e-9))
@@ -50,12 +56,16 @@ def insert_scine(probedata,probedata_env, params, derived):
 			probedata_mem = numpy.column_stack((probedata_env[prev:curr+1,0],probedata_env[prev:curr+1,1]+100e-9))
 			curr_area = probe_shape.area(probedata_mem)
 			assert curr_area > 0
+			area.append(curr_area)
 			Rmembrane.append(1/(params['Mem_cond'] * curr_area) if curr_area > 0 else 1e20)
 			Cmembrane.append(curr_area*0.01 if curr_area > 0 else 1e-20)
         derived['R_seal_i'] = R_seal
         derived['Rmembrane_i'] = Rmembrane
         derived['Cmembrane_i'] = Cmembrane
-        #derived['CPE_alpha'] = 
+        derived['CPE_extremes'] = cpes
+        derived['CPE_alpha'] = CPE_alpha
+        derived['CPE_k'] = CPE_k
+        derived['area'] = area
         print derived
         f = open(the_platform.file('derived_params.json'), 'w')
         f.write(json.dumps(derived))
@@ -67,5 +77,5 @@ def insert_scine(probedata,probedata_env, params, derived):
         for k, v in derived.items():
             assert k not in p
             p[k] = v
-        cir_path = model.simple2.generate(the_platform.file('model1.cir'), p)
+        cir_path = model.simple2.generate(the_platform.file('model1.cir'), p,cpes)
         spice.ac_analysis(cir_path, -5, 5)

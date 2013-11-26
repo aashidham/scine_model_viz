@@ -11,10 +11,11 @@ import model.simple
 import progression
 import the_platform
 import numpy, math, scipy.integrate
-
+import probe_shape
 
 def closest(a,val):
 	return min(range(len(a)), key=lambda i: abs(a[i]-val))
+	
 
 def run(sid,low_env,high_env):
     # Build up experimental samples.
@@ -61,11 +62,13 @@ def run(sid,low_env,high_env):
     probedata_file = str(sid)+"/"+str(sid)+"_probe_shape.txt"
     probedata = eval(open(probedata_file).read())
     probedata = numpy.array(probedata)
+    
+    #intra goes from 0 to low_idx, env goes from low_idx to high_idx, and extra goes from high_idx to end. low_idx and high_idx are double counted in both intra / extra and env, FYI.
     low_idx = closest(probedata[:,0],low_env)
     high_idx = closest(probedata[:,0],high_env)
     probedata_env = probedata[low_idx:high_idx+1]
-    probedata_intra = probedata[0:low_idx]
-    probedata_extra = probedata[high_idx+1:]
+    probedata_intra = probedata[0:low_idx+1]
+    probedata_extra = probedata[high_idx:]
     probedata_mem = numpy.column_stack((probedata_env[:,0],probedata_env[:,1]+100e-9))
     
     A_intra=area(probedata_intra)
@@ -76,6 +79,31 @@ def run(sid,low_env,high_env):
     L_env=arc_length(probedata_env)
     L_extra=arc_length(probedata_extra)
     
+    cpe_bounds_intra = material_boundaries(probedata_intra)
+    cpe_bounds_extra = material_boundaries(probedata_extra)
+    cpes = []
+    for idx in range(1,len(cpe_bounds_intra)):
+    	curr = cpe_bounds_intra[idx]
+    	prev = cpe_bounds_intra[idx-1]
+    	cpe_area = area(probedata_intra[prev:curr+1])
+    	if prev == 0:
+    		cpe_area = cpe_area + math.pi*probedata[0,1]**2
+    	cpe_alpha = probedata_intra[prev,2]
+    	cpe_k = probedata_intra[prev,3]
+    	id = "cpe_intra_"+str(idx)
+    	name = "Xintracpe_i_"+str(idx)
+    	cpes.append({"type":"intra","id":id,"area":cpe_area,"alpha":cpe_alpha,"k":cpe_k,"name":name})    
+    
+    for idx in range(1,len(cpe_bounds_extra)):
+    	curr = cpe_bounds_extra[idx]
+    	prev = cpe_bounds_extra[idx-1]
+    	cpe_area = area(probedata_extra[prev:curr+1])
+    	cpe_alpha = probedata_extra[prev,2]
+    	cpe_k = probedata_extra[prev,3]
+    	id = "cpe_extra_"+str(idx)
+    	name = "Xextracpe_i_"+str(idx)
+    	cpes.append({"type":"extra","id":id,"area":cpe_area,"alpha":cpe_alpha,"k":cpe_k,"name":name})
+
     derived_params = {
 		'A_intra': A_intra,
 		'A_env': A_env,
@@ -98,7 +126,7 @@ def run(sid,low_env,high_env):
 		# and run the simulation.
 		print sample
 		assert len(probedata_env) > int(sample['compartments'])
-		insert_scine.insert_scine(probedata,probedata_env,sample,derived_params)
+		insert_scine.insert_scine(probedata,probedata_env,sample,derived_params,cpes)
     
     root = "/".join(root)
     

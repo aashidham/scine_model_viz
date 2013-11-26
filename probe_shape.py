@@ -34,7 +34,7 @@ def material_boundaries(np_probedata):
 		prev = np_probedata[idx-1]
 		curr = np_probedata[idx]
 		if not numpy.array_equal(prev[2:4],curr[2:4]):
-			boundaries.append(idx)
+			boundaries.append(idx-1) #append last idx before material change
 	return [0] + boundaries + [len(np_probedata)-1]
 
 def build_table(np_probedata,num_compartments):
