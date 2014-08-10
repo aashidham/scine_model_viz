@@ -76,5 +76,5 @@ def insert_scine(probedata,probedata_env, params, derived,cpes):
         for k, v in derived.items():
             assert k not in p
             p[k] = v
-        cir_path = model.simple2.generate(the_platform.file('model1.cir'), p,cpes)
+	cir_path = model.simple2.generate(the_platform.file('model1.cir'), p,cpes)
         spice.ac_analysis(cir_path, -5, 5)

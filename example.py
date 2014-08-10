@@ -18,7 +18,7 @@ def handler(client_socket):
 	text = f.read()
 	[sid,email,params,probedata,low_env,high_env] = pickle.loads(text)
     
-	platform.Platform.set_root("/home/ubuntu/model-2/scine-model/"+str(sid))
+	platform.Platform.set_root("/home/ubuntu/scine-model/"+str(sid))
 	f = open(str(sid)+"/"+str(sid)+".csv","wb")
 	f.write(params)
 	f.close()
@@ -30,12 +30,11 @@ def handler(client_socket):
 	f.write(high_env+"\n")
 	f.close()
 	
-	from_csv.run(sid,float(low_env),float(high_env))
-	email_send2.send_mail(email,str(sid),str(sid))
-	"""
+	try:
+        	from_csv.run(sid,float(low_env),float(high_env))
+		email_send2.send_mail(email,str(sid),str(sid))
 	except Exception,e:
 		email_send2.send_error(email,str(type(e))+" "+str(e),str(sid))
-	"""
 	#shutil.rmtree(sid)
 
 

@@ -12,7 +12,8 @@ def generate(neuron_path, filename, params):
     def run_netlister(fn):
         f, netlist_fn = tempfile.mkstemp()
         os.close(f)
-        p = subprocess.Popen(['gnetlist', '-n', '-g', 'spice', fn, '-o', netlist_fn], stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+        import pdb;pdb.set_trace()
+	p = subprocess.Popen(['gnetlist', '-n', '-g', 'spice', fn, '-o', netlist_fn], stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
         s, err = p.communicate()
         p.wait()
         #assert err == '', err
