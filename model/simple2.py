@@ -5,6 +5,8 @@ import tempfile
 
 import model.ladder_cpe
 
+
+
 def generate(filename, params,cpes):
 	netlist = ["""* Spice netlister for gnetlist
 CStray 0 electrode_bus %s""" % params['CStray']]
@@ -13,9 +15,15 @@ CStray 0 electrode_bus %s""" % params['CStray']]
 	netlist.append('Cwholecell solution_bus cell_bus %s'%params['Cwholecell'])
 	netlist.append('Rwholecell solution_bus cell_bus %s'%params['Rwholecell'])
 	netlist.append('R_pene cell_bus Rpene_bus %s'%params['R_pene'])
+	
+	#in the below, need to substitute for global area
+	netlist.append('i1 0 cell_bus pulse(0    8e-010      25ms       1ms        1ms        25ms  100ms)')
+	netlist.append('.model memr hh (area=1e-4)')
+	netlist.append('amen cell_bus 0 memr')
+	
 	netlist.append('%s\n\n%s\n%s\n') #first for extreme_cpes, second for env_region, third for the generated_ladders
-	netlist.append('Vcell cell_bus 0 1v ac')
-	netlist.append('.model cell_potential filesource (file="data/short-spike", amploffset=[0], amplscale=[1])')
+	#netlist.append('Vcell cell_bus 0 1v ac')
+	#netlist.append('.model cell_potential filesource (file="data/short-spike", amploffset=[0], amplscale=[1])')
 	netlist = '\n'.join(netlist)
 	
 	extreme_cpes = []
@@ -33,8 +41,10 @@ CStray 0 electrode_bus %s""" % params['CStray']]
 		else:
 			env_region.append("R_seal_i_%i compartment_%i compartment_%i %s" % (i,i,i-1,params['R_seal_i'][i]))
 		env_region.append("Xsheathedcpe_i_%i compartment_%i electrode_bus sheathed_cpe_i_%i" % (i,i,i))
-		env_region.append("Rmembrane_i_%i compartment_%i cell_bus %s" % (i,i,params['Rmembrane_i'][i]))
-		env_region.append("Cmembrane_i_%i compartment_%i cell_bus %s" % (i,i,params['Cmembrane_i'][i]))
+		#env_region.append("Rmembrane_i_%i compartment_%i cell_bus %s" % (i,i,params['Rmembrane_i'][i]))
+		#env_region.append("Cmembrane_i_%i compartment_%i cell_bus %s" % (i,i,params['Cmembrane_i'][i]))
+		env_region.append("amen_%i cell_bus compartment_%i memr_%i" % (i,i,i))
+		env_region.append(".model memr_%i hh (area=%s)" % (i,params['area'][i]))
 	env_region = '\n'.join(env_region)
 	
 	generated_ladders=[]

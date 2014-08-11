@@ -130,15 +130,16 @@ def run(sid,low_env,high_env):
     
     root = "/".join(root)
     
-    os.system('find %s -type d -links 2 | parallel -v  --gnu --sshlogin 8/ubuntu@54.187.68.162 --transfer --return {}/the.data "ngspice -p {}/model1.cir < {}/spice.input"' % root)
+    os.system('find %s -type d -links 2 | parallel -v  --gnu --sshlogin 8/ubuntu@54.200.155.183 --transfer --return {}/the.data "ngspice -p {}/model1.cir < {}/spice.input"' % root)
+    #os.system('find %s -type d -links 2 | parallel -v  --gnu --sshlogin 8/ubuntu@54.187.68.162 --transfer --return {}/the.data "ngspice -p {}/model1.cir < {}/spice.input"' % root)
     #os.system('find %s -type d -links 2 | parallel -v  --gnu {}/the.data "ngspice -p {}/model1.cir < {}/spice.input"' % root)
 
     for i in range(len(samples)):
-	   mag_plot_fn = root + "/trial=%i/plot-mag.png" % i
-	   phase_plot_fn = root + "/trial=%i/plot-phase.png" % i
+	   cell_plot_fn = root + "/trial=%i/plot-cell-bus.png" % i
+	   electrode_plot_fn = root + "/trial=%i/plot-electrode-bus.png" % i
 	   data = root + "/trial=%i/the.data" % i
-	   subprocess.check_call("gnuplot -e \"set term png; set output '%s'; set logscale x; plot '%s' using 1:2 with linespoints notitle\"" % (mag_plot_fn, data), shell=True)
-	   subprocess.check_call("gnuplot -e \"set term png; set output '%s'; set logscale x; plot '%s' using 3:4 with linespoints notitle\"" % (phase_plot_fn, data), shell=True)
+	   subprocess.check_call("gnuplot -e \"set term png; set output '%s'; plot '%s' using 1:2 with linespoints notitle\"" % (cell_plot_fn, data), shell=True)
+	   subprocess.check_call("gnuplot -e \"set term png; set output '%s'; plot '%s' using 3:4 with linespoints notitle\"" % (electrode_plot_fn, data), shell=True)
 
 if __name__ == '__main__':
     assert len(sys.argv) == 2

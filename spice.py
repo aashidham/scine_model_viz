@@ -36,3 +36,15 @@ quit
     f = open(the_platform.file('spice.input'), 'w')
     f.write(inp)
     f.close()
+    
+def transient_analysis_2(circuit_fn):
+	
+	data = the_platform.file('the.data')
+	inp = """
+tran 50us 200ms
+wrdata '%s' v(cell_bus) v(electrode_bus)
+quit 
+""" % ('.'.join(data.split('.')[:-1]))
+	f = open(the_platform.file('spice.input'), 'w')
+	f.write(inp)
+	f.close()
